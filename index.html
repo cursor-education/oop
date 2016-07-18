@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>OOP</title>
+        <style>
+          @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+          @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+          @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+          body { font-family: 'Droid Serif'; }
+          h1, h2, h3 {
+            font-family: 'Yanone Kaffeesatz';
+            font-weight: normal;
+          }
+          .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+        </style>
+    </head>
+    <body>
+        <textarea id="source">
+
+class: center, middle
+
+#OOP in Javascript
+
+---
+
+##OOP
+
+The OOP programming style in Javascript consist of three fundamental features:
+
+####Encapsulation
+A language mechanism for restricting access to some of the object's components.
+####Polymorphism
+Is the ability to create a variable, a function, or an object that has more than one form.
+####Inheritance
+Is a way to reuse code of existing objects, or to establish a subtype from an existing object, or both, depending upon programming language support.
+
+---
+##Object
+
+An object is an unordered list data types that is stored as a series of name-value pairs. Each item in the list is called a property (functions are called methods).
+
+```javascript
+var obj = {};
+
+var obj = {
+    a: "foo",
+    b: 42,
+    c: {},
+
+    superMethod: function() {
+        console.log('Ima supermethod!');
+    }
+};
+
+```
+
+---
+##Object
+
+###Define Object
+
+- Object literal
+
+```javascript
+var obj = {};
+```
+- New keyword
+
+```javascript
+var obj = new Object();
+```
+- Create method
+
+```javascript
+var obj = Object.create(null);
+```
+
+---
+##Object
+
+###Define property
+
+- Dot notation
+
+```javascript
+obj.a = 42;
+```
+
+- Computed property
+
+```javascript
+obj['b'] = 'Hello';
+
+var prop = 'c';
+obj[prop] = 22;
+
+obj[prop + 1] = 23;
+```
+
+- Delete property
+
+```javascript
+
+delete obj.b;
+delete window.globalVar;
+```
+---
+##Object
+###Define property
+```javascript
+Object.defineProperty(obj, prop, descriptor);
+
+// Descriptor object
+// value – value, undefined by default
+// writable – can be changed if true, false by default
+// configurable – if true, can be deleted, an can be changed by another defineProperty. False by default.
+// enumerable – if true, can be seen by for..in and Object.keys() method. By default false.
+// get – getter function. By default false.
+// set – setter function. By default false.
+
+Object.defineProperty(obj, 'myProp', {
+    value: "Some value",
+    configurable: true,
+    writable: true,
+    enumerable: true
+});
+```
+
+---
+##Object
+###Getters and setters
+
+```javascript
+var o = {
+    _private: "Nothing is set",
+
+    set current(val) {
+        this._private = "Currently is - " + val;
+    },
+
+    get current() {
+        return this._private;
+    }
+}
+
+// Encapsulation
+
+o.current // "Nothing is set"
+o.current = 2;
+o.current // "Currently is - 2"
+```
+
+---
+##This
+This value is called the context of the call and will be determined at the time of the function call.
+
+- Object scope
+
+```javascript
+var obj = {
+    a: 1,
+    myMethod: function() {
+        console.log(this); // this links to object itself
+    }
+}
+
+obj.myMethod(); // {a: 1}
+```
+
+---
+##This
+
+- Global Scope
+
+```javascript
+var obj = {
+    a: 1,
+    myMethod: function() {
+        console.log(this);
+    }
+}
+
+var redirect = obj.myMethod;
+redirect(); // Window (window.redirect());
+
+setTimeout(obj.myMethod, 1000);  // this - window
+
+setTimeout(obj.myMethod.bind(obj), 1000);  // this - obj {a: 1}
+
+setTimeout(obj.myMethod(), 1000);  // invalid invocation
+
+```
+
+---
+##This
+
+- Call, Apply Scope
+
+```javascript
+var obj = {
+    a: 1,
+    myMethod: function() {
+        console.log(this);
+    }
+}
+
+var obj2 = {
+    b: 3
+}
+
+obj.myMethod.call(obj2); // this - object {b: 3}
+```
+
+---
+##This
+
+- Constructor scope
+
+```javascript
+function User(name, age) {
+    this.name = name;
+    this.age = age;
+
+    this.myMethod = function() {
+        console.log(this);
+    }
+}
+
+var admin = new User('Admin', 32);
+
+admin.myMethod(); // {name: 'Admin', age: 32}
+```
+
+---
+##Constructor (Class)
+
+Factory function which creates object
+
+```javascript
+function User(name, age) {
+    var _privateVariable = 10;
+
+    function _privateFunction(str) {
+        console.log(str);
+    }
+
+    this.name = name;
+    this.age = age;
+
+    this.myMethod = function() {
+        console.log(this);
+    }
+
+    this.publicMethod = function(str) {
+        _privateFunction("Ima public, " + str);
+    }
+}
+
+var admin = new User('Admin', 32);
+admin._privateFunction('Pokemon'); // Error (Encapsulation)
+admin.publicMethod('Pokemon'); // Ima public, Pokemon
+```
+---
+##Constructor
+
+Checking the constructor
+
+```javascript
+admin.constructor; // function User() {}
+
+typeof admin; // 'object'
+
+admin instanceof User; // true
+
+```
+
+---
+##Inheritance
+
+#### Constructor inheritance
+
+```javascript
+function Human(name) {
+    var _body = { // Encapsulation
+        hands: 2,
+        legs: 2
+    };
+    this.name = name;
+    this.great = function() {
+        console.log(this.name + ', says Hello!!!');
+    }
+}
+
+function Man(name, age) {
+    Human.call(this, name); // Inherit super class
+
+    this.age = age;
+}
+
+var john = new Man('John', 32);
+john.great(); // John, says Hello!!!
+john.age // 32
+```
+---
+##Inheritance
+
+#### Prototypal inheritance
+
+![Default-aligned image](natives.png)
+
+---
+##Inheritance
+
+__proto__ - chained link to object prototype
+prototype - Object which all instances follow like example (applicable if only constructor exists)
+
+```javascript
+var human = {
+    go: function() {
+        console.log('Ima going');
+    }
+}
+
+var girl = {
+    charm: function() {
+        console.log('Ima charming');
+    }
+}
+
+girl.__proto__ = human;
+girl.charm(); // Ima charming
+girl.go(); // Ima going
+
+var boy = Object.create(human);
+boy.go(); // Ima going
+```
+
+---
+##Polymorphism
+
+Objects in ECMAScript are polymorphic in several meanings.
+For example, one function can be applied to different objects,
+just like it would be the native characteristic of an object
+(because this value determinate on entering the execution context):
+
+```javascript
+function test(o) {
+    console.log(this.a, this.b); // this - window
+}
+
+var o1 = {a: 10, b: 20};
+var o2 = {a: 100, b: 200};
+
+test.call(o1); // 10, 20
+test.call(o2); // 100, 200
+
+var a = 1;
+var b = 2;
+test(); // 1, 2
+```
+
+---
+##Best Practices
+
+#### Use 'use strict';
+
+```javascript
+function test(o) {
+    'use strict';
+    console.log(this.a, this.b); // this - undefined
+}
+
+var o1 = {a: 10, b: 20};
+var o2 = {a: 100, b: 200};
+
+test.call(o1); // 10, 20
+test.call(o2); // 100, 200
+
+var a = 1;
+var b = 2;
+test(); // Error
+```
+
+---
+##Best Practices
+
+#### Call, Apply, Bind;
+
+```javascript
+function test(param1, param2) {
+    'use strict';
+    console.log(this.a, this.b, param1, param2);
+}
+
+var o1 = {a: 10, b: 20};
+
+test.call(o1, 'Hello', 'World'); // 10 20 "Hello" "World"
+test.apply(o1, ['Hello', 'World']); // 10 20 "Hello" "World"
+var newFunc = test.bind(o1, 'Hello', 'World');
+
+newFunc(); // 10 20 "Hello" "World"
+```
+
+        </textarea>
+        <script src="remark-latest.min.js"></script>
+        <script>
+            var slideshow = remark.create();
+        </script>
+    </body>
+</html>
