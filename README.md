@@ -1,3 +1,3 @@
 # oop
 
-https://cursor-education.github.io/jquey/#1
+https://cursor-education.github.io/oop/#1
